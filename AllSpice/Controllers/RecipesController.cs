@@ -14,10 +14,17 @@ namespace AllSpice.Controllers
   public class RecipesController : ControllerBase
   {
     private readonly RecipesService _rs;
+    private readonly IngredientsService _ings;
+    private readonly StepsService _ss;
 
-    public RecipesController(RecipesService rs)
+    private readonly FavoritesService _fs;
+
+    public RecipesController(RecipesService rs, IngredientsService ings, StepsService ss, FavoritesService fs)
     {
       _rs = rs;
+      _ings = ings;
+      _ss = ss;
+      _fs = fs;
     }
 
     [HttpGet]
@@ -47,6 +54,50 @@ namespace AllSpice.Controllers
         return BadRequest(e.Message);
       }
     }
+
+    [HttpGet("{id}/ingredients")]
+    public ActionResult<Ingredient> GetRecipeIngredients(int id)
+    {
+      try
+      {
+        List<Ingredient> ingredients = _ings.GetIngredientsByRecipeId(id);
+        return Ok(ingredients);
+      }
+      catch (Exception e)
+      {
+        return BadRequest(e.Message);
+      }
+    }
+
+    [HttpGet("{id}/steps")]
+    public ActionResult<Step> GetRecipeSteps(int id)
+    {
+      try
+      {
+        List<Step> steps = _ss.GetStepsByRecipeId(id);
+        return Ok(steps);
+      }
+      catch (Exception e)
+      {
+        return BadRequest(e.Message);
+      }
+    }
+
+    [HttpGet("{id}/favorites")]
+    public ActionResult<Ingredient> GetRecipeFavorites(int id)
+    {
+      try
+      {
+        List<Favorite> favorites = _fs.GetRecipeFavorites(id);
+        return Ok(favorites);
+      }
+      catch (Exception e)
+      {
+        return BadRequest(e.Message);
+      }
+    }
+
+
 
 
     [HttpPost]

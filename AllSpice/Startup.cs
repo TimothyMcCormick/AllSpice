@@ -44,6 +44,9 @@ namespace AllSpice
 
       services.AddTransient<StepsRepository>();
       services.AddTransient<StepsService>();
+
+      services.AddTransient<FavoritesRepository>();
+      services.AddTransient<FavoritesService>();
     }
 
     private void ConfigureCors(IServiceCollection services)
@@ -52,14 +55,14 @@ namespace AllSpice
       {
         options.AddPolicy("CorsDevPolicy", builder =>
               {
-            builder
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials()
-                  .WithOrigins(new string[]{
+                builder
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials()
+                      .WithOrigins(new string[]{
                         "http://localhost:8080", "http://localhost:8081"
+                  });
               });
-          });
       });
     }
 

@@ -9,49 +9,49 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AllSpice.Controllers
 {
+
   [ApiController]
-  [Route("[controller]")]
-  public class AccountController : ControllerBase
+  [Route("api/[controller]")]
+  [Authorize]
+  public class FavoritesController : ControllerBase
   {
-    private readonly AccountService _accountService;
     private readonly FavoritesService _fs;
 
-    public AccountController(AccountService accountService, FavoritesService fs)
+    public FavoritesController(FavoritesService fs)
     {
-      _accountService = accountService;
       _fs = fs;
     }
 
     [HttpGet]
-    [Authorize]
-    public async Task<ActionResult<Account>> Get()
+    public async Task<ActionResult<List<Favorite>>> GetFavorites()
     {
       try
       {
         Account userInfo = await HttpContext.GetUserInfoAsync<Account>();
-        return Ok(_accountService.GetOrCreateProfile(userInfo));
-      }
-      catch (Exception e)
-      {
-        return BadRequest(e.Message);
-      }
-    }
-
-    [HttpGet("favorites")]
-    public async Task<ActionResult<List<Favorite>>> GetAccountFavorites()
-    {
-      try
-      {
-        Account userInfo = await HttpContext.GetUserInfoAsync<Account>();
-        List<Favorite> favorites = _fs.GetAccountFavorites(userInfo.Id);
+        List<Favorite> favorites = _fs.GetFavorites();
         return Ok(favorites);
       }
       catch (Exception e)
       {
-        return BadRequest(e.Message);
+        throw new Exception(e.Message);
+      }
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Favorite>> CreateAsync([FromBody] Favorite favoriteData)
+    {
+      try
+      {
+        Account userInfo = await HttpContext.GetUserInfoAsync<Account>();
+        favoriteData.AccountId = userInfo.Id;
+        Favorite favorite = _fs.Create(favoriteData);
+        favorite.Creator = userInfo;
+        return Ok(favorite);
+      }
+      catch (Exception e)
+      {
+        throw new Exception(e.Message);
       }
     }
   }
-
-
 }
